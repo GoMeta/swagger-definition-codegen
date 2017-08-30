@@ -1,14 +1,14 @@
 {
   "name": "swagger-definition-codegen",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "description": "A tool to generate Javascript constructors for objects from Swagger definitions.",
   "main": "index.js",
   "scripts": {
-  	"start": "node index.js"
+    "start": "node index.js"
   },
   "bin": {
-  	"swagger-definition-codegen": "index.js"
+    "swagger-definition-codegen": "index.js"
   },
   "author": "Sean Thielen <sean@gometa.io> (http://gometa.io)",
   "dependencies": {
