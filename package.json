@@ -1,6 +1,6 @@
 {
   "name": "swagger-definition-codegen",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "MIT",
   "description": "A tool to generate Javascript constructors for objects from Swagger definitions.",
   "main": "index.js",
