@@ -40,7 +40,7 @@ Object.keys(definitions)
 		const docs = keys
 			.map((key) => {
 				const description = properties[key].description || '';
-				return ` * @param ${key} ${description.replace(/\n$/, '')}`;
+				return ` * @param ${key}${description.replace(/\n$/, '')}`;
 			})
 			.join('\n');
 
@@ -53,19 +53,66 @@ Object.keys(definitions)
 			.join('\n')
 			.trim();
 
-		const file = `/* eslint-disable object-shorthand, camelcase */
+		const file = `/* eslint-disable */
 
 /**
  * @name ${definition}
-${docs}
+ * @class
  */
-export default function ${definition}(${args}) {
-  return {
-    ${obj}
-  };
+export default class ${definition} {
+  /**
+   * Build a ${definition}
+   *
+   * @memberOf ${definition}
+${keys.map((key) => {
+	const description = properties[key].description || '';
+	return `   * @param ${key} ${description.replace(/\n$/, '')}`
+}).join('\n')}
+   */
+  constructor(${keys.join(', ').trim()}) {
+${keys.map((key) => `    this.${key} = ${key};`).join('\n')}
+  }
+
+  /**
+   * Build a ${definition} from a JSON object
+   *
+   * @memberOf ${definition}
+   * @param json A JSON object
+   * @return Instance of ${definition}
+   */
+  static fromJSON(json) {
+    return new ${definition}(${keys.map((key) => `json.${key}`).join(', ').trim()});
+  }
+
+  /**
+   * Validate a JSON object
+   *
+   * @memberOf ${definition}
+   * @param json A JSON object
+   * @return The validated JSON object
+   * @throws
+   */
+  static validate(json) {
+    const keys = [${keys.map(key => `'${key}'`).join(', ').trim()}];
+    if (Object.keys(json).every(key => keys.includes(key))) {
+      return json;
+    }
+
+    throw new Error('invalid_json');
+  }
+
+  /**
+   * The structured object
+   *
+   * @memberOf ${definition}
+   */
+  get object() {
+    return {
+${keys.map((key) => `      ${key}: this.${key},`).join('\n')}
+    };
+  }
 }
 `;
-
 		console.log(`Generating for ${definition}`);
 		fs.writeFileSync(path.join(outputPath, `${definition}.js`), file);
 	});
