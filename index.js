@@ -16,14 +16,11 @@ if (program.args.length < 1) {
 	process.exit(1);
 }
 
-// Resolve paths
 const input = path.resolve(program.args[0]);
 const outputPath = path.resolve(program.output || '.');
 
-// Load the Swagger file
 const swagger = fs.readFileSync(input, 'utf8');
 
-// Attempt to parse JSON
 let definitions;
 try {
 	const parsedSwagger = JSON.parse(swagger);
@@ -34,31 +31,29 @@ try {
 }
 
 Object.keys(definitions)
-	.filter((definition) => definitions[definition].type === 'object') // Remove non-object definitions
+	.filter((definition) => definitions[definition].type === 'object')
 	.forEach((definition) => {
 		const properties = definitions[definition].properties;
 
 		const keys = Object.keys(properties);
 
-		// Map keys to javadoc params
 		const docs = keys
-			.map((key) => ` * @param ${key} ${properties[key].description.replace(/\n$/, '')}`)
+			.map((key) => {
+				const description = properties[key].description || '';
+				return ` * @param ${key} ${description.replace(/\n$/, '')}`;
+			})
 			.join('\n');
 
-		// Generate function arguments
 		const args = keys
 			.join(', ')
 			.trim();
 
-		// Generate explicit object map
 		const obj = keys
 			.map((key) => `    ${key}: ${key},`)
 			.join('\n')
 			.trim();
 
-		// Generate constructor code
-		const file = `
-/* eslint-disable object-shorthand, camelcase */
+		const file = `/* eslint-disable object-shorthand, camelcase */
 
 /**
  * @name ${definition}
@@ -70,8 +65,7 @@ export default function ${definition}(${args}) {
   };
 }
 `;
-		
-		// Write the generated file
+
 		console.log(`Generating for ${definition}`);
 		fs.writeFileSync(path.join(outputPath, `${definition}.js`), file);
 	});
