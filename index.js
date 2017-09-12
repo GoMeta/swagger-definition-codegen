@@ -51,6 +51,9 @@ Object.keys(definitions)
     .filter((definition) => definitions[definition].type === 'object')
     .forEach((definition) => {
         const properties = definitions[definition].properties;
+        if (!properties) {
+          return;
+        }
 
         const keys = Object.keys(properties);
 
